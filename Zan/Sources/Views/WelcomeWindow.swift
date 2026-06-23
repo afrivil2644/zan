@@ -62,6 +62,6 @@ struct WelcomeView: View {
 
             MenuContentView()
         }
-        .frame(width: 360)
+        .frame(width: 432)
     }
 }

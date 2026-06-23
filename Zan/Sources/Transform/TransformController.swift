@@ -14,7 +14,6 @@ final class TransformController: ObservableObject {
 
     private var actions: ActionStore?
     private var history: HistoryStore?
-    private let transformer: TextTransformer = OpenAITransformer()
     private let hud = TransformHUDController()
     private let popup = InfoPopupController(title: "Result", icon: "sparkles")
     private var registeredKeys = Set<String>()
@@ -89,9 +88,10 @@ final class TransformController: ObservableObject {
                 hud.show(self)
             }
             let model = AppSettings.currentTextModel()
+            let engine = TextEngineFactory.make()
             Task {
                 do {
-                    let result = try await transformer.transform(
+                    let result = try await engine.transform(
                         prompt: action.prompt, text: text, model: model)
                     self.deliver(result, action: action, original: text)
                 } catch {

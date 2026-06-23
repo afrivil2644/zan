@@ -1,27 +1,35 @@
 import Foundation
 import Security
 
-/// Stores the OpenAI API key in the macOS Keychain. The key is never written to
-/// disk in plaintext, never logged, and never committed.
+/// Stores API keys in the macOS Keychain. Keys are never written to disk in
+/// plaintext, never logged, and never committed.
 enum KeychainStore {
     static let service = "dev.local.zan"
-    static let account = "openai-api-key"
 
-    static var openAIKey: String? {
-        read(account: account)
-    }
+    private static let openAIAccount = "openai-api-key"
+    private static let anthropicAccount = "anthropic-api-key"
 
-    static func setOpenAIKey(_ value: String) {
+    // MARK: OpenAI
+
+    static var openAIKey: String? { read(account: openAIAccount) }
+    static var hasOpenAIKey: Bool { (openAIKey?.isEmpty == false) }
+    static func setOpenAIKey(_ value: String) { setKey(value, account: openAIAccount) }
+
+    // MARK: Anthropic
+
+    static var anthropicKey: String? { read(account: anthropicAccount) }
+    static var hasAnthropicKey: Bool { (anthropicKey?.isEmpty == false) }
+    static func setAnthropicKey(_ value: String) { setKey(value, account: anthropicAccount) }
+
+    // MARK: -
+
+    private static func setKey(_ value: String, account: String) {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
             delete(account: account)
         } else {
             save(trimmed, account: account)
         }
-    }
-
-    static var hasOpenAIKey: Bool {
-        (openAIKey?.isEmpty == false)
     }
 
     // MARK: - Generic helpers

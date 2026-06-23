@@ -32,7 +32,7 @@ struct MenuContentView: View {
             Divider()
             footer
         }
-        .frame(width: 360)
+        .frame(width: 432)
     }
 
     private var header: some View {

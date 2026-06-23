@@ -41,7 +41,19 @@ struct ActionsSectionView: View {
 struct ActionRow: View {
     @Binding var action: Action
     @EnvironmentObject var actions: ActionStore
-    @State private var expanded = false
+    @State private var expanded: Bool
+    @State private var showInfo = false
+
+    init(action: Binding<Action>) {
+        self._action = action
+        // A nameless draft opens expanded so it can be named right away.
+        let isDraft = action.wrappedValue.name.trimmingCharacters(in: .whitespaces).isEmpty
+        self._expanded = State(initialValue: isDraft)
+    }
+
+    private var nameMissing: Bool {
+        action.name.trimmingCharacters(in: .whitespaces).isEmpty
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -62,7 +74,18 @@ struct ActionRow: View {
 
                 Spacer()
 
+                Button { showInfo = true } label: {
+                    Image(systemName: "info.circle").font(.caption2).foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("What this action does")
+                .popover(isPresented: $showInfo, arrowEdge: .bottom) {
+                    ActionInfoPopover(action: action)
+                }
+
                 KeyboardShortcuts.Recorder(for: KeyboardShortcuts.Name(action.shortcutKey))
+                    .controlSize(.small)
+                    .frame(width: 116)
 
                 if !action.isBuiltIn {
                     Button { actions.delete(action) } label: {
@@ -80,6 +103,11 @@ struct ActionRow: View {
             }
 
             if expanded {
+                if nameMissing {
+                    Label("Add a name to save this action", systemImage: "exclamationmark.circle")
+                        .font(.caption2).foregroundStyle(.orange)
+                }
+
                 Toggle("Enabled", isOn: $action.enabled)
                     .toggleStyle(.switch).font(.caption)
                     .onChange(of: action.enabled) { _, _ in actions.save() }
@@ -92,7 +120,14 @@ struct ActionRow: View {
                     ForEach(Action.Output.allCases) { Text($0.label).tag($0) }
                 }
                 .pickerStyle(.menu).font(.caption)
-                .onChange(of: action.output) { _, _ in actions.save() }
+                .onChange(of: action.output) { _, newValue in
+                    // Swap the starter template to match the new output, but only
+                    // if the prompt is still an unedited template.
+                    if action.engine == .ai && Action.starterPrompts.contains(action.prompt) {
+                        action.prompt = Action.starterPrompt(for: newValue)
+                    }
+                    actions.save()
+                }
 
                 if action.engine == .prefix {
                     TextField("Prefix", text: $action.prefix)
@@ -114,6 +149,53 @@ struct ActionRow: View {
         case .replaceSelection: return "arrow.2.squarepath"
         case .popup:            return "rectangle.on.rectangle"
         case .copy:             return "doc.on.doc"
+        }
+    }
+}
+
+/// Plain-language explanation of a single action: what it does, how to trigger
+/// it, and what its output mode means.
+struct ActionInfoPopover: View {
+    let action: Action
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(action.name.isEmpty ? "New action" : action.name)
+                .font(.headline)
+
+            Text(action.detail.isEmpty ? "No description yet. Add one in the expanded view." : action.detail)
+                .font(.callout)
+                .foregroundStyle(action.detail.isEmpty ? .secondary : .primary)
+
+            Divider()
+
+            infoRow("How to use", "Select text in any app, then press this action's hotkey.")
+            infoRow("Engine", engineText)
+            infoRow("Output", outputText)
+        }
+        .padding(14)
+        .frame(width: 270)
+    }
+
+    private func infoRow(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(label).font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
+            Text(value).font(.caption)
+        }
+    }
+
+    private var engineText: String {
+        switch action.engine {
+        case .ai:     return "Runs your prompt through the AI text model."
+        case .prefix: return "Adds a fixed prefix to the selection (no AI)."
+        }
+    }
+
+    private var outputText: String {
+        switch action.output {
+        case .replaceSelection: return "Replaces your selected text with the result."
+        case .popup:            return "Shows the result in a popup; your text stays unchanged."
+        case .copy:             return "Copies the result to your clipboard."
         }
     }
 }

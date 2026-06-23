@@ -25,7 +25,6 @@ final class DictationController: ObservableObject {
 
     private let recorder = AudioRecorder()
     private let transcriber: Transcriber = OpenAITranscriber()
-    private let transformer: TextTransformer = OpenAITransformer()
     /// Set at launch so completed dictations are logged to the activity list.
     var history: HistoryStore?
     private let overlay = RecordingOverlayController()
@@ -153,7 +152,7 @@ final class DictationController: ObservableObject {
         }
         statusMessage = "Cleaning up…"
         do {
-            let cleaned = try await transformer.transform(
+            let cleaned = try await TextEngineFactory.make().transform(
                 prompt: prompt, text: text, model: AppSettings.currentTextModel())
             return cleaned.isEmpty ? text : cleaned
         } catch {

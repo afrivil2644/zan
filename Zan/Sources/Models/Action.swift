@@ -37,6 +37,27 @@ struct Action: Identifiable, Codable, Equatable {
     var isBuiltIn: Bool = false
 
     static func makeShortcutKey() -> String { "action_\(UUID().uuidString)" }
+
+    /// Starter prompt for a new action, tailored to the output mode. The `[...]`
+    /// parts are placeholders meant to be edited.
+    static func starterPrompt(for output: Output) -> String {
+        switch output {
+        case .replaceSelection:
+            return "Rewrite the selected text to [describe the change you want]. Keep the meaning. Return only the result."
+        case .popup:
+            return "[Explain, translate, or analyze] the selected text. Return only the [result], with no preamble."
+        case .copy:
+            return "Turn the selected text into [what you want copied]. Return only the result."
+        }
+    }
+
+    /// The set of unedited starter prompts, used to decide whether it's safe to
+    /// auto-swap the template when the output changes (don't clobber edits).
+    static let starterPrompts: Set<String> = [
+        starterPrompt(for: .replaceSelection),
+        starterPrompt(for: .popup),
+        starterPrompt(for: .copy),
+    ]
 }
 
 extension Action {

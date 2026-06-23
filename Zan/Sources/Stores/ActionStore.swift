@@ -31,16 +31,18 @@ final class ActionStore: ObservableObject {
 
     // MARK: - Mutations
 
+    /// Adds a blank draft at the top. Not persisted until it has a name (see
+    /// `save()`), so abandoning an unnamed draft leaves nothing on disk.
     func addAction() {
-        actions.append(Action(
-            name: "New action",
-            detail: "Describe what it does.",
+        actions.insert(Action(
+            name: "",
+            detail: "",
             shortcutKey: Action.makeShortcutKey(),
             engine: .ai,
-            prompt: "Transform the selected text. Return only the result.",
+            prompt: Action.starterPrompt(for: .replaceSelection),
             output: .replaceSelection
-        ))
-        save()
+        ), at: 0)
+        // Intentionally no save(): a nameless draft should not be stored.
     }
 
     func add(_ action: Action) {
@@ -58,8 +60,12 @@ final class ActionStore: ObservableObject {
         save()
     }
 
+    /// Persists only named actions; unnamed drafts are never written to disk.
     func save() {
-        guard let data = try? JSONEncoder().encode(actions) else { return }
+        let named = actions.filter {
+            !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        guard let data = try? JSONEncoder().encode(named) else { return }
         try? data.write(to: fileURL, options: .atomic)
     }
 

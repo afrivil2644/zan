@@ -8,8 +8,16 @@ final class AppSettings: ObservableObject {
     @Published var transcriptionModel: String {
         didSet { defaults.set(transcriptionModel, forKey: Keys.transcriptionModel) }
     }
-    @Published var textModel: String {
-        didSet { defaults.set(textModel, forKey: Keys.textModel) }
+    /// Which provider powers text actions + dictation cleanup. (Transcription is
+    /// always OpenAI; Anthropic has no audio API.)
+    @Published var textProvider: TextProvider {
+        didSet { defaults.set(textProvider.rawValue, forKey: Keys.textProvider) }
+    }
+    @Published var openAITextModel: String {
+        didSet { defaults.set(openAITextModel, forKey: Keys.textModel) }
+    }
+    @Published var anthropicTextModel: String {
+        didSet { defaults.set(anthropicTextModel, forKey: Keys.anthropicTextModel) }
     }
     @Published var cleanupEnabled: Bool {
         didSet { defaults.set(cleanupEnabled, forKey: Keys.cleanupEnabled) }
@@ -30,7 +38,17 @@ final class AppSettings: ObservableObject {
     // Quick-pick presets. The fields are free-text too, so any model ID (incl.
     // ones newer than this list) can be typed in directly.
     static let transcriptionModels = ["gpt-4o-mini-transcribe", "gpt-4o-transcribe", "whisper-1"]
-    static let textModels = ["gpt-4o-mini", "gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1", "gpt-4o"]
+    static let openAITextModels = ["gpt-4o-mini", "gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1", "gpt-4o"]
+    static let anthropicTextModels = ["claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-8"]
+
+    enum TextProvider: String, CaseIterable, Identifiable {
+        case openai, anthropic
+        var id: String { rawValue }
+        var label: String { self == .openai ? "OpenAI" : "Anthropic" }
+        var defaultModels: [String] {
+            self == .openai ? AppSettings.openAITextModels : AppSettings.anthropicTextModels
+        }
+    }
 
     enum DictationMode: String, CaseIterable, Identifiable {
         case toggle, holdToTalk
@@ -43,8 +61,12 @@ final class AppSettings: ObservableObject {
     init() {
         self.transcriptionModel = defaults.string(forKey: Keys.transcriptionModel)
             ?? Self.transcriptionModels[0]
-        self.textModel = defaults.string(forKey: Keys.textModel)
-            ?? Self.textModels[0]
+        self.textProvider = TextProvider(rawValue: defaults.string(forKey: Keys.textProvider) ?? "")
+            ?? .openai
+        self.openAITextModel = defaults.string(forKey: Keys.textModel)
+            ?? Self.openAITextModels[0]
+        self.anthropicTextModel = defaults.string(forKey: Keys.anthropicTextModel)
+            ?? Self.anthropicTextModels[0]
         self.cleanupEnabled = defaults.object(forKey: Keys.cleanupEnabled) as? Bool ?? true
         self.dictationMode = DictationMode(rawValue: defaults.string(forKey: Keys.dictationMode) ?? "")
             ?? .toggle
@@ -72,9 +94,19 @@ final class AppSettings: ObservableObject {
         UserDefaults.standard.string(forKey: Keys.transcriptionModel) ?? transcriptionModels[0]
     }
 
-    /// Reads the persisted text model (used off the view layer).
+    /// Reads the persisted text provider (used off the view layer).
+    static func currentTextProvider() -> TextProvider {
+        TextProvider(rawValue: UserDefaults.standard.string(forKey: Keys.textProvider) ?? "") ?? .openai
+    }
+
+    /// Reads the persisted text model for the active provider (off the view layer).
     static func currentTextModel() -> String {
-        UserDefaults.standard.string(forKey: Keys.textModel) ?? textModels[0]
+        switch currentTextProvider() {
+        case .openai:
+            return UserDefaults.standard.string(forKey: Keys.textModel) ?? openAITextModels[0]
+        case .anthropic:
+            return UserDefaults.standard.string(forKey: Keys.anthropicTextModel) ?? anthropicTextModels[0]
+        }
     }
 
     /// Reads whether dictation AI cleanup is enabled (used off the view layer).
@@ -90,6 +122,8 @@ final class AppSettings: ObservableObject {
     private enum Keys {
         static let transcriptionModel = "transcriptionModel"
         static let textModel = "textModel"
+        static let textProvider = "textProvider"
+        static let anthropicTextModel = "anthropicTextModel"
         static let cleanupEnabled = "cleanupEnabled"
         static let cleanupPrompt = "cleanupPrompt"
         static let dictationMode = "dictationMode"
