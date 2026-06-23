@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct ZanApp: App {
     // App-lifetime stores, injected into the dropdown.
-    @StateObject private var presets = PresetStore()
+    @StateObject private var actions = ActionStore()
     @StateObject private var settings = AppSettings()
     @StateObject private var dictation = DictationController()
     @StateObject private var transforms = TransformController()
@@ -16,7 +16,7 @@ struct ZanApp: App {
         // Transforms dropdown. The icon reflects recording state.
         MenuBarExtra {
             MenuContentView()
-                .environmentObject(presets)
+                .environmentObject(actions)
                 .environmentObject(settings)
                 .environmentObject(dictation)
                 .environmentObject(transforms)
@@ -24,16 +24,15 @@ struct ZanApp: App {
                 .environmentObject(permissions)
         } label: {
             Image(systemName: dictation.isRecording ? "waveform.circle.fill" : "waveform")
-                // Register transform hotkeys + wire history at launch (the label
+                // Register action hotkeys + wire history at launch (the label
                 // renders even when the dropdown has never been opened).
                 .onAppear {
-                    transforms.bind(presets: presets, history: history)
+                    transforms.bind(actions: actions, history: history)
                     dictation.history = history
-                    dictation.presets = presets
                     if settings.openWindowOnLaunch {
                         welcome.showOnce(content: AnyView(
                             WelcomeView()
-                                .environmentObject(presets)
+                                .environmentObject(actions)
                                 .environmentObject(settings)
                                 .environmentObject(dictation)
                                 .environmentObject(transforms)

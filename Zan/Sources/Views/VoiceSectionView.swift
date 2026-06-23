@@ -4,7 +4,6 @@ import KeyboardShortcuts
 /// Voice-to-Text settings: trigger hotkey, mode, transcription model,
 /// AI cleanup toggle + editable cleanup prompt, and the transcript log path.
 struct VoiceSectionView: View {
-    @EnvironmentObject var presets: PresetStore
     @EnvironmentObject var settings: AppSettings
 
     var body: some View {
@@ -37,13 +36,7 @@ struct VoiceSectionView: View {
             if settings.cleanupEnabled {
                 Text("Cleanup instructions")
                     .font(.caption).foregroundStyle(.secondary)
-                PromptEditor(text: $presets.cleanup.prompt) { presets.save() }
-            }
-
-            LabeledRow("Log file") {
-                TextField("", text: $settings.transcriptLogPath)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.caption)
+                PromptEditor(text: $settings.cleanupPrompt) { }
             }
         }
     }

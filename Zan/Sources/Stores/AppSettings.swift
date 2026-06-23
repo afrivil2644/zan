@@ -14,12 +14,13 @@ final class AppSettings: ObservableObject {
     @Published var cleanupEnabled: Bool {
         didSet { defaults.set(cleanupEnabled, forKey: Keys.cleanupEnabled) }
     }
+    /// Editable prompt used to clean up dictation before insertion.
+    @Published var cleanupPrompt: String {
+        didSet { defaults.set(cleanupPrompt, forKey: Keys.cleanupPrompt) }
+    }
     /// Dictation trigger behavior: toggle (press to start/stop) or hold-to-talk.
     @Published var dictationMode: DictationMode {
         didSet { defaults.set(dictationMode.rawValue, forKey: Keys.dictationMode) }
-    }
-    @Published var transcriptLogPath: String {
-        didSet { defaults.set(transcriptLogPath, forKey: Keys.transcriptLogPath) }
     }
     /// Show the app window automatically on launch (so it isn't invisible).
     @Published var openWindowOnLaunch: Bool {
@@ -47,10 +48,17 @@ final class AppSettings: ObservableObject {
         self.cleanupEnabled = defaults.object(forKey: Keys.cleanupEnabled) as? Bool ?? true
         self.dictationMode = DictationMode(rawValue: defaults.string(forKey: Keys.dictationMode) ?? "")
             ?? .toggle
-        self.transcriptLogPath = defaults.string(forKey: Keys.transcriptLogPath)
-            ?? Self.defaultLogPath()
         self.openWindowOnLaunch = defaults.object(forKey: Keys.openWindowOnLaunch) as? Bool ?? true
+        self.cleanupPrompt = defaults.string(forKey: Keys.cleanupPrompt) ?? Self.defaultCleanupPrompt
     }
+
+    static let defaultCleanupPrompt = """
+    Lightly clean up this dictated text. Fix grammar, punctuation, \
+    capitalization, and remove filler words such as um, uh, and like. \
+    Keep my wording and meaning. Do not rewrite or summarize. \
+    Never use em dashes; use commas or restructure the sentence. \
+    Return only the cleaned text.
+    """
 
     /// Reads the persisted dictation mode directly (used by the global hotkey
     /// handler, which has no view-injected settings instance).
@@ -74,18 +82,17 @@ final class AppSettings: ObservableObject {
         UserDefaults.standard.object(forKey: Keys.cleanupEnabled) as? Bool ?? true
     }
 
-    static func defaultLogPath() -> String {
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        return docs?.appendingPathComponent("zan-transcripts.md").path
-            ?? "~/Documents/zan-transcripts.md"
+    /// Reads the persisted cleanup prompt (used off the view layer).
+    static func currentCleanupPrompt() -> String {
+        UserDefaults.standard.string(forKey: Keys.cleanupPrompt) ?? defaultCleanupPrompt
     }
 
     private enum Keys {
         static let transcriptionModel = "transcriptionModel"
         static let textModel = "textModel"
         static let cleanupEnabled = "cleanupEnabled"
+        static let cleanupPrompt = "cleanupPrompt"
         static let dictationMode = "dictationMode"
-        static let transcriptLogPath = "transcriptLogPath"
         static let openWindowOnLaunch = "openWindowOnLaunch"
     }
 }

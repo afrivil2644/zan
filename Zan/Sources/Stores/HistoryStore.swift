@@ -25,7 +25,7 @@ final class HistoryStore: ObservableObject {
     private let maxEntries = 100
 
     init() {
-        fileURL = PresetStore.appSupportDirectory().appendingPathComponent("history.json")
+        fileURL = AppPaths.appSupport().appendingPathComponent("history.json")
         if let data = try? Data(contentsOf: fileURL),
            let stored = try? JSONDecoder().decode([HistoryEntry].self, from: data) {
             entries = stored

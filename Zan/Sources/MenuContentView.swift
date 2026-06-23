@@ -1,14 +1,10 @@
 import SwiftUI
 import KeyboardShortcuts
 
-/// The menu-bar dropdown. Reference UX: a single panel with a Voice-to-Text
-/// section and a Transforms section.
-///
-/// Scaffold status: all controls render and PERSIST (prompts -> JSON, settings
-/// -> UserDefaults, hotkeys -> KeyboardShortcuts). The *actions* behind them
-/// (recording, transcription, injection, transforms) get wired in Stages 2-7.
+/// The menu-bar dropdown: a single panel with Voice to Text, Actions, Recent
+/// activity, OpenAI, and System sections.
 struct MenuContentView: View {
-    @EnvironmentObject var presets: PresetStore
+    @EnvironmentObject var actions: ActionStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -21,7 +17,7 @@ struct MenuContentView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     VoiceSectionView()
                     Divider()
-                    TransformsSectionView()
+                    ActionsSectionView()
                     Divider()
                     HistorySectionView()
                     Divider()
@@ -52,7 +48,7 @@ struct MenuContentView: View {
 
     private var footer: some View {
         HStack {
-            Button("Reset prompts") { presets.resetToDefaults() }
+            Button("Reset actions") { actions.resetToDefaults() }
                 .font(.caption)
 
             Spacer()
@@ -83,7 +79,7 @@ struct SectionHeader: View {
 
 #Preview {
     MenuContentView()
-        .environmentObject(PresetStore())
+        .environmentObject(ActionStore())
         .environmentObject(AppSettings())
         .environmentObject(DictationController())
         .environmentObject(TransformController())

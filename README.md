@@ -21,16 +21,15 @@ telemetry.
   or hold-to-talk.
 - **On-screen recording HUD** with a live waveform, plus a Stop button.
 - **Optional AI cleanup** of dictated text (editable prompt) before it's inserted.
-- **Text transforms** that replace the selection, each with its own hotkey and
-  editable prompt:
-  - Proofread
-  - Make professional
-  - Strip em dashes
-  - …and you can add your own.
-- **Read-only popups** (don't change your text):
-  - Translate selection to English
-  - Summarize selection (one sentence, or up to 3 bullets)
-- **Open in r.jina.ai** — rewrites a selected URL to its Jina Reader form.
+- **Actions** — one editable concept for every text feature. Each action has a
+  name, description, hotkey, an engine (AI prompt or a built-in text op), and an
+  output mode (replace the selection, show a read-only popup, or copy). Ships
+  with:
+  - Proofread, Make professional, Strip em dashes (replace)
+  - Translate to English, Summarize (popup, leaves your text unchanged)
+  - Open in r.jina.ai (prepends the Jina Reader prefix to a URL)
+  - …and you can add your own: name it, write a prompt, pick an output, bind a
+    hotkey. No code.
 - **Recent activity** — an in-app history of past dictations and transforms with
   their text (copyable).
 - **Permissions panel** and **launch at login** toggle.

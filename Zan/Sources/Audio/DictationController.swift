@@ -28,8 +28,6 @@ final class DictationController: ObservableObject {
     private let transformer: TextTransformer = OpenAITransformer()
     /// Set at launch so completed dictations are logged to the activity list.
     var history: HistoryStore?
-    /// Set at launch so dictation cleanup can read the editable cleanup prompt.
-    var presets: PresetStore?
     private let overlay = RecordingOverlayController()
     private var meterTimer: Timer?
 
@@ -148,8 +146,8 @@ final class DictationController: ObservableObject {
     /// Runs the transcript through the editable cleanup prompt when the
     /// "Clean up with AI" toggle is on. Best-effort: on failure, returns raw.
     private func cleanedIfEnabled(_ text: String) async -> String {
+        let prompt = AppSettings.currentCleanupPrompt()
         guard AppSettings.currentCleanupEnabled(),
-              let prompt = presets?.cleanup.prompt,
               !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return text
         }
