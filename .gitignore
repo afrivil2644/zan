@@ -1,0 +1,14 @@
+# Xcode / build
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# XcodeGen produces this from project.yml; regenerate with `xcodegen generate`
+*.xcodeproj/
+
+# macOS
+.DS_Store
+
+# Secrets (none are committed; API key lives in the Keychain)
+*.env
