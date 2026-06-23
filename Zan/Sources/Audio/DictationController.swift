@@ -24,7 +24,6 @@ final class DictationController: ObservableObject {
     @Published private(set) var needsAccessibility = false
 
     private let recorder = AudioRecorder()
-    private let transcriber: Transcriber = OpenAITranscriber()
     /// Set at launch so completed dictations are logged to the activity list.
     var history: HistoryStore?
     private let overlay = RecordingOverlayController()
@@ -108,16 +107,19 @@ final class DictationController: ObservableObject {
     // MARK: - Transcription
 
     private func transcribe(_ url: URL) {
-        guard KeychainStore.hasOpenAIKey else {
+        // OpenAI needs a key; on-device Whisper does not.
+        if AppSettings.currentTranscriptionProvider() == .openai, !KeychainStore.hasOpenAIKey {
             statusMessage = "Add your OpenAI API key below"
             lastError = nil
             return
         }
         let model = AppSettings.currentTranscriptionModel()
+        let transcriber = TranscriberFactory.make()
+        let onDevice = AppSettings.currentTranscriptionProvider() == .local
         isTranscribing = true
         transcript = ""
         lastError = nil
-        statusMessage = "Transcribing…"
+        statusMessage = onDevice ? "Transcribing on device…" : "Transcribing…"
 
         Task {
             do {

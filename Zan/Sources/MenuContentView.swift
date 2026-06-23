@@ -5,6 +5,7 @@ import KeyboardShortcuts
 /// activity, OpenAI, and System sections.
 struct MenuContentView: View {
     @EnvironmentObject var actions: ActionStore
+    @State private var showResetConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -48,8 +49,17 @@ struct MenuContentView: View {
 
     private var footer: some View {
         HStack {
-            Button("Reset actions") { actions.resetToDefaults() }
+            Button("Reset actions") { showResetConfirm = true }
                 .font(.caption)
+                .confirmationDialog(
+                    "Reset all actions to defaults?",
+                    isPresented: $showResetConfirm, titleVisibility: .visible
+                ) {
+                    Button("Reset", role: .destructive) { actions.resetToDefaults() }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("This removes your custom actions and restores the built-in ones. Your edits to built-in prompts are lost.")
+                }
 
             Spacer()
 

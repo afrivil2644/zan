@@ -5,8 +5,16 @@ import Combine
 /// it goes to the Keychain (wired in Stage 3).
 @MainActor
 final class AppSettings: ObservableObject {
+    /// Which engine transcribes dictation: OpenAI (cloud) or on-device Whisper.
+    @Published var transcriptionProvider: TranscriptionProvider {
+        didSet { defaults.set(transcriptionProvider.rawValue, forKey: Keys.transcriptionProvider) }
+    }
     @Published var transcriptionModel: String {
         didSet { defaults.set(transcriptionModel, forKey: Keys.transcriptionModel) }
+    }
+    /// On-device Whisper model name (used when provider == local).
+    @Published var whisperModel: String {
+        didSet { defaults.set(whisperModel, forKey: Keys.whisperModel) }
     }
     /// Which provider powers text actions + dictation cleanup. (Transcription is
     /// always OpenAI; Anthropic has no audio API.)
@@ -38,8 +46,18 @@ final class AppSettings: ObservableObject {
     // Quick-pick presets. The fields are free-text too, so any model ID (incl.
     // ones newer than this list) can be typed in directly.
     static let transcriptionModels = ["gpt-4o-mini-transcribe", "gpt-4o-transcribe", "whisper-1"]
+    static let whisperModels = ["tiny", "base", "small", "large-v3"]
     static let openAITextModels = ["gpt-4o-mini", "gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1", "gpt-4o"]
     static let anthropicTextModels = ["claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-8"]
+
+    enum TranscriptionProvider: String, CaseIterable, Identifiable {
+        case openai, local
+        var id: String { rawValue }
+        var label: String { self == .openai ? "OpenAI (cloud)" : "On-device" }
+        var defaultModels: [String] {
+            self == .openai ? AppSettings.transcriptionModels : AppSettings.whisperModels
+        }
+    }
 
     enum TextProvider: String, CaseIterable, Identifiable {
         case openai, anthropic
@@ -59,8 +77,11 @@ final class AppSettings: ObservableObject {
     private let defaults = UserDefaults.standard
 
     init() {
+        self.transcriptionProvider = TranscriptionProvider(
+            rawValue: defaults.string(forKey: Keys.transcriptionProvider) ?? "") ?? .openai
         self.transcriptionModel = defaults.string(forKey: Keys.transcriptionModel)
             ?? Self.transcriptionModels[0]
+        self.whisperModel = defaults.string(forKey: Keys.whisperModel) ?? "base"
         self.textProvider = TextProvider(rawValue: defaults.string(forKey: Keys.textProvider) ?? "")
             ?? .openai
         self.openAITextModel = defaults.string(forKey: Keys.textModel)
@@ -89,9 +110,20 @@ final class AppSettings: ObservableObject {
             ?? .toggle
     }
 
-    /// Reads the persisted transcription model (used off the view layer).
+    /// Reads the persisted transcription provider (used off the view layer).
+    static func currentTranscriptionProvider() -> TranscriptionProvider {
+        TranscriptionProvider(rawValue: UserDefaults.standard.string(forKey: Keys.transcriptionProvider) ?? "")
+            ?? .openai
+    }
+
+    /// Reads the transcription model for the active voice provider (off the view layer).
     static func currentTranscriptionModel() -> String {
-        UserDefaults.standard.string(forKey: Keys.transcriptionModel) ?? transcriptionModels[0]
+        switch currentTranscriptionProvider() {
+        case .openai:
+            return UserDefaults.standard.string(forKey: Keys.transcriptionModel) ?? transcriptionModels[0]
+        case .local:
+            return UserDefaults.standard.string(forKey: Keys.whisperModel) ?? "base"
+        }
     }
 
     /// Reads the persisted text provider (used off the view layer).
@@ -120,7 +152,9 @@ final class AppSettings: ObservableObject {
     }
 
     private enum Keys {
+        static let transcriptionProvider = "transcriptionProvider"
         static let transcriptionModel = "transcriptionModel"
+        static let whisperModel = "whisperModel"
         static let textModel = "textModel"
         static let textProvider = "textProvider"
         static let anthropicTextModel = "anthropicTextModel"

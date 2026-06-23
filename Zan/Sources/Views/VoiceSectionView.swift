@@ -1,16 +1,18 @@
 import SwiftUI
 import KeyboardShortcuts
 
-/// Voice-to-Text settings: trigger hotkey, mode, transcription model,
-/// AI cleanup toggle + editable cleanup prompt, and the transcript log path.
+/// Voice-to-Text settings: one dictation hotkey, the transcription engine, and
+/// optional AI cleanup. This is dictation (a single trigger), distinct from the
+/// Actions list below.
 struct VoiceSectionView: View {
     @EnvironmentObject var settings: AppSettings
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Voice to Text", systemImage: "mic")
+            Text("Dictate with one hotkey. Speech is transcribed and typed at your cursor.")
+                .font(.caption2).foregroundStyle(.tertiary)
 
-            // Trigger hotkey (real recorder; recording wiring lands in Stage 2).
             LabeledRow("Trigger key") {
                 KeyboardShortcuts.Recorder(for: .dictationTrigger)
             }
@@ -25,10 +27,21 @@ struct VoiceSectionView: View {
                 .fixedSize()
             }
 
-            LabeledRow("Model") {
-                ModelPickerField(selection: $settings.transcriptionModel,
-                                 presets: AppSettings.transcriptionModels)
+            LabeledRow("Engine") {
+                Picker("", selection: $settings.transcriptionProvider) {
+                    ForEach(AppSettings.TranscriptionProvider.allCases) { Text($0.label).tag($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
             }
+
+            LabeledRow("Model") {
+                ModelPickerField(selection: transcriptionModelBinding,
+                                 presets: settings.transcriptionProvider.defaultModels)
+            }
+
+            Text(engineNote)
+                .font(.caption2).foregroundStyle(.tertiary)
 
             Toggle("Clean up with AI", isOn: $settings.cleanupEnabled)
                 .toggleStyle(.switch)
@@ -39,6 +52,26 @@ struct VoiceSectionView: View {
                 PromptEditor(text: $settings.cleanupPrompt) { }
             }
         }
+    }
+
+    private var engineNote: String {
+        switch settings.transcriptionProvider {
+        case .openai:
+            return "Uses your OpenAI key. Note: Claude/Anthropic has no speech-to-text API, so it can't transcribe voice."
+        case .local:
+            return "Runs on your Mac with Whisper. No key, fully private. First use downloads the model (a few hundred MB)."
+        }
+    }
+
+    /// Binds to the active voice provider's model so each remembers its own.
+    private var transcriptionModelBinding: Binding<String> {
+        Binding(
+            get: { settings.transcriptionProvider == .openai ? settings.transcriptionModel : settings.whisperModel },
+            set: {
+                if settings.transcriptionProvider == .openai { settings.transcriptionModel = $0 }
+                else { settings.whisperModel = $0 }
+            }
+        )
     }
 }
 

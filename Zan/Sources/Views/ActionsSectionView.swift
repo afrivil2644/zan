@@ -43,6 +43,7 @@ struct ActionRow: View {
     @EnvironmentObject var actions: ActionStore
     @State private var expanded: Bool
     @State private var showInfo = false
+    @State private var showDeleteConfirm = false
 
     init(action: Binding<Action>) {
         self._action = action
@@ -88,10 +89,19 @@ struct ActionRow: View {
                     .frame(width: 116)
 
                 if !action.isBuiltIn {
-                    Button { actions.delete(action) } label: {
+                    Button { showDeleteConfirm = true } label: {
                         Image(systemName: "trash").foregroundStyle(.red)
                     }
                     .buttonStyle(.plain)
+                    .confirmationDialog(
+                        "Delete \"\(action.name.isEmpty ? "this action" : action.name)\"?",
+                        isPresented: $showDeleteConfirm, titleVisibility: .visible
+                    ) {
+                        Button("Delete", role: .destructive) { actions.delete(action) }
+                        Button("Cancel", role: .cancel) { }
+                    } message: {
+                        Text("This removes the action and its prompt. Its hotkey is freed.")
+                    }
                 }
             }
 
