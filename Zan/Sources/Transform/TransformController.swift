@@ -11,6 +11,7 @@ final class TransformController: ObservableObject {
     @Published private(set) var isRunning = false
     @Published var statusMessage: String?
     @Published private(set) var lastError: String?
+    @Published private(set) var needsAccessibility = false
 
     private var actions: ActionStore?
     private var history: HistoryStore?
@@ -47,15 +48,33 @@ final class TransformController: ObservableObject {
         run(action)
     }
 
+    private func hasTextKey() -> Bool {
+        switch AppSettings.currentTextProvider() {
+        case .openai:    return KeychainStore.hasOpenAIKey
+        case .anthropic: return KeychainStore.hasAnthropicKey
+        }
+    }
+
+    func openAccessibilitySettings() {
+        AccessibilityPermission.request()
+        AccessibilityPermission.openSettings()
+    }
+
+    func recheckAccessibility() {
+        needsAccessibility = !AccessibilityPermission.isTrusted
+    }
+
     func run(_ action: Action) {
         guard !isRunning else { return }
         guard AccessibilityPermission.isTrusted else {
             AccessibilityPermission.request()
-            flash("Enable Accessibility for actions")
+            needsAccessibility = true
+            flash("Accessibility needed (see the banner in Text)")
             return
         }
-        if action.engine == .ai && !KeychainStore.hasOpenAIKey {
-            flash("Add your OpenAI API key first")
+        needsAccessibility = false
+        if action.engine == .ai && !hasTextKey() {
+            flash("Add your \(AppSettings.currentTextProvider().label) API key")
             return
         }
         SelectionReader.read { [weak self] selected in

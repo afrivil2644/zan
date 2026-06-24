@@ -20,6 +20,21 @@ struct ActionsSectionView: View {
                 .help("Add an action")
             }
 
+            if transforms.needsAccessibility {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                    Text("Allow Accessibility so actions can edit text.")
+                        .font(.caption2)
+                    Spacer()
+                    Button("Open Settings") { transforms.openAccessibilitySettings() }
+                        .font(.caption2).buttonStyle(.link)
+                    Button("Recheck") { transforms.recheckAccessibility() }
+                        .font(.caption2).buttonStyle(.link)
+                }
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 8).fill(Color.orange.opacity(0.1)))
+            }
+
             // Only surface in-progress and error states here; successful "done"
             // feedback shows in the on-screen HUD, not as lingering text.
             if transforms.isRunning {
