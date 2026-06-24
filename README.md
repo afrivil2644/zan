@@ -15,6 +15,24 @@ It runs in the menu bar (no Dock icon), keeps your API key in the macOS Keychain
 and sends your audio/text only to the OpenAI API calls you configure. No
 telemetry.
 
+## Get Zan
+
+Two ways to use it:
+
+- **Download and run it as-is.** Grab the latest notarized build from
+  [Releases](https://github.com/MangoTango234/zan/releases/latest), unzip, and
+  drag **Zan.app** to Applications. It's signed and notarized by Apple (FUTODI,
+  UAB), so it opens with no Gatekeeper warnings. On-device transcription is
+  included, so voice works with no API key.
+- **Build on top of it.** Clone the repo and make it your own, add actions,
+  change prompts, wire a different model or provider, or reuse the pieces in your
+  own app. It's MIT licensed. See *Build & run* below.
+
+## Feedback
+
+Ideas, bugs, or feature requests? Email **hello@futodi.com**, or open an issue on
+GitHub. Happy to hear how you'd make Zan better.
+
 ## Features
 
 - **Dictation** with a global hotkey, in two modes: toggle (press to start/stop)

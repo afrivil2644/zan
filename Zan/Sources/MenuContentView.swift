@@ -7,6 +7,10 @@ struct MenuContentView: View {
     @EnvironmentObject var actions: ActionStore
     @State private var showResetConfirm = false
 
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.1"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
@@ -35,7 +39,7 @@ struct MenuContentView: View {
             Image(systemName: "waveform").foregroundStyle(.tint)
             Text("Zan").font(.headline)
             Spacer()
-            Text("v0.1").font(.caption).foregroundStyle(.tertiary)
+            Text("v\(appVersion)").font(.caption).foregroundStyle(.tertiary)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
