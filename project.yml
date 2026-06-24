@@ -37,6 +37,7 @@ targets:
       - package: KeyboardShortcuts
     sources:
       - path: Zan/Sources
+      - path: Zan/Resources
     info:
       path: Zan/Info.plist
       properties:
@@ -52,5 +53,5 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.futodi.zan
         PRODUCT_NAME: Zan
         CODE_SIGN_ENTITLEMENTS: Zan/Zan.entitlements
-        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         COMBINE_HIDPI_IMAGES: YES
