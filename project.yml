@@ -43,6 +43,9 @@ targets:
       properties:
         CFBundleName: Zan
         CFBundleDisplayName: Zan
+        # XcodeGen doesn't auto-fill these from MARKETING_VERSION; set explicitly.
+        CFBundleShortVersionString: "0.1.1"
+        CFBundleVersion: "2"
         # LSUIElement = menu-bar agent: no Dock icon, no main window.
         LSUIElement: true
         LSMinimumSystemVersion: "14.0"
